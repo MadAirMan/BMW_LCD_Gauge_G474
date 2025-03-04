@@ -23,6 +23,6 @@ CMake Deprecation Warning:
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Minimal optimization, debug info included
--- Configuring done (1.2s)
+-- Configuring done (0.9s)
 -- Generating done (0.0s)
 -- Build files have been written to: /Users/rsmolyakov/STM32CubeIDE/workspace_1.16.1/BMW_LCD_Gauge_G474/cmake-build-debug

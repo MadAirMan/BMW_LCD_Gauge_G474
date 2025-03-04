@@ -5,6 +5,8 @@
 Debug/
 Release/
 *.launch
+.osx.*
+.osx
 
 # Бинарники
 *.bin
@@ -20,3 +22,4 @@ Release/
 # Файлы IDE
 .vscode/
 .idea/
+cmake-build-dubug/

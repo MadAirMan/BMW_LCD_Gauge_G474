@@ -92,7 +92,6 @@ static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 static void FDCAN_Config(void);
-void LogMessage(const char *format, ...);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -506,17 +505,21 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
                     strcat(trans_str, " ");
                 }
             }
-            LogMessage(trans_str);
+            strcat(trans_str, "\n");
+            HAL_UART_Transmit(&huart2, (uint8_t *) trans_str, strlen(trans_str), 100);
 
             // Обработка сообщения в зависимости от ID
             if (RxHeader.Identifier == ENGINE_DATA_ID ||  RxHeader.Identifier == GEARBOX_DATA_ID)
                 obd2_Handler(RxData);  // Вызываем обработчик данных OBD-II
             } else {
                 // Неизвестное сообщение, логируем
-            LogMessage("Unknown ID: 0x%lX", RxHeader.Identifier);
+                sprintf(trans_str, "Unknown ID: 0x%lX\n", RxHeader.Identifier);
+                HAL_UART_Transmit(&huart2, (uint8_t*)trans_str, strlen(trans_str), HAL_MAX_DELAY);
             }
         } else {
             // Логируем ошибку приёма
+            sprintf(trans_str, "CAN RX ERROR\n");
+            HAL_UART_Transmit(&huart2, (uint8_t*)trans_str, strlen(trans_str), HAL_MAX_DELAY);
             HAL_FDCAN_ErrorCallback(hfdcan);
         }
     }
@@ -536,9 +539,8 @@ int _write(int file, char *ptr, int len)
 ////колбек для ошибок
 void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan) {
     uint32_t er = HAL_FDCAN_GetError(hfdcan);
-    LogMessage("ERROR CAN %lu %08lX", er, er);
-//    sprintf(trans_str, "ERROR CAN %lu %08lX", er, er);
-//    HAL_UART_Transmit(&huart2, (uint8_t *) trans_str, strlen(trans_str), 100);
+    sprintf(trans_str, "ERROR CAN %lu %08lX", er, er);
+    HAL_UART_Transmit(&huart2, (uint8_t *) trans_str, strlen(trans_str), 100);
 }
 
 /// Прерывание таймера каждые 0,5 секунды
@@ -547,24 +549,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (obd2_getLastRequestTime() + TIMEOUT_MS < HAL_GetTick()) {
         OBD2_NEED_NEXT_REQUEST = true;
         //TODO Зажечь диод или распечатать сообщение на дисплее
-        LogMessage("no response on time");
+        HAL_UART_Transmit(&huart2, (uint8_t *)"no response on time\n", 20, 100);
     }
-}
-
-void LogMessage(const char *format, ...) {
-    char buffer[LOG_BUFFER_SIZE];  // Буфер для строки
-    va_list args;
-
-    va_start(args, format);
-    int len = vsnprintf(buffer, sizeof(buffer) - 2, format, args);  // -2 для '\n' и '\0'
-    va_end(args);
-
-    // Проверяем, есть ли уже '\n' в конце. Если нет — добавляем
-    if (len > 0 && buffer[len - 1] != '\n') {
-        strcat(buffer, "\n");
-    }
-
-    HAL_UART_Transmit(&huart2, (uint8_t*)buffer, strlen(buffer), HAL_MAX_DELAY);
 }
 
 /* USER CODE END 4 */
