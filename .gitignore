@@ -1,0 +1,22 @@
+# STM32CubeIDE файлы
+.cproject
+.project
+.settings/
+Debug/
+Release/
+*.launch
+
+# Бинарники
+*.bin
+*.hex
+*.elf
+*.map
+*.o
+*.a
+*.d
+*.lst
+*.out
+
+# Файлы IDE
+.vscode/
+.idea/
