@@ -23,3 +23,4 @@ Release/
 .vscode/
 .idea/
 cmake-build-dubug/
+cmake-build-dubug/*
