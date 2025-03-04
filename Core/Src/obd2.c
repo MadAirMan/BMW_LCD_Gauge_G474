@@ -24,24 +24,12 @@ extern bool OBD2_NEED_NEXT_REQUEST;
 static uint32_t last_request_time = 0;
 static uint8_t num = 0;
 
-///объявление функций valueHandler()
-//extern void valueHandlerInt();
-//extern void valueHandlerFloat();
-//void valueHandlerInt();
-//void valueHandlerFloat();
-
-//extern void display_UpdateElementInt(uint16_t parametr, int16_t value);
-//extern void display_UpdateElementFloat(uint16_t parametr, double value);
-extern void LogMessage(const char *format, ...);
-
 // Буфер для логов
 char log_str[128];
 
 /* Private function prototypes -----------------------------------------------*/
 void obd2_SendFrame(uint16_t address, uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3, uint8_t byte4,
                     uint8_t byte5, uint8_t byte6, uint8_t byte7);
-
-//uint8_t obd2_GetParamIndex(uint8_t pid);
 
 /* Private user code ---------------------------------------------------------*/
 void obd2_NextRequest() {
@@ -144,9 +132,6 @@ void obd2_SendFrame(uint16_t address, uint8_t byte0, uint8_t byte1, uint8_t byte
     TxData[5] = byte5;
     TxData[6] = byte6;
     TxData[7] = byte7;
-
-    // Буфер для логов
-//    char log_str[128];
 
 // Попытки отправить сообщение
     for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {

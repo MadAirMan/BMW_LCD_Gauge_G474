@@ -8,23 +8,22 @@
 #include "image.h"
 
 ////массив цифр для дисплея
-const uint16_t* digits_num[] = {
-        digits_0,
-        digits_1,
-        digits_2,
-        digits_3,
-        digits_4,
-        digits_5,
-        digits_6,
-        digits_7,
-        digits_8,
-        digits_9,
-        digits_empty
-};
+const uint16_t* digits_num[11];
 
 //////Инициализация дисплея
 void Display_Init(void) {
     NV3030B_Init();
+    digits_num[0] = digits_0;
+    digits_num[1] = digits_1;
+    digits_num[2] = digits_2;
+    digits_num[3] = digits_3;
+    digits_num[4] = digits_4;
+    digits_num[5] = digits_5;
+    digits_num[6] = digits_6;
+    digits_num[7] = digits_7;
+    digits_num[8] = digits_8;
+    digits_num[9] = digits_9;
+    digits_num[10] = digits_empty;
     HAL_GPIO_WritePin(BLK_GPIO_Port, BLK_Pin, GPIO_PIN_SET);
     NV3030B_FillScreen(NV3030B_BLACK);
     NV3030B_DrawBitmap(7, 2, coolant_temp, 66, 48, NV3030B_AMBER);
@@ -109,8 +108,8 @@ void Update_Volt_Display(double value) {
     }
 }
 
-void display_UpdateElementInt(uint16_t parametr, int16_t value) {
-    switch (parametr) {
+void display_UpdateElementInt(uint16_t can_id, int16_t value) {
+    switch (can_id) {
         case PID_COOLANT_TEMP:
             Update_Coolant_Temperature_Display(value);
             break;
@@ -120,13 +119,19 @@ void display_UpdateElementInt(uint16_t parametr, int16_t value) {
         case PID_GEAR_OIL_TEMP:
             Update_Gear_Oil_Temperature_Display(value);
             break;
+        default:
+            Update_Coolant_Temperature_Display(0);
+            Update_Oil_Temperature_Display(0);
+            Update_Gear_Oil_Temperature_Display(0);
     }
 }
 
-void display_UpdateElementFloat(uint16_t parametr, double value) {
-    switch (parametr) {
+void display_UpdateElementFloat(uint16_t can_id, double value) {
+    switch (can_id) {
         case PID_VOLTAGE:
             Update_Volt_Display(value);
             break;
+        default:
+            Update_Volt_Display(0);
     }
 }
