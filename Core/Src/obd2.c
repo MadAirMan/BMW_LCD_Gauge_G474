@@ -64,11 +64,11 @@ void obd2_NextRequest() {
 
 //// Функция для обработки полученных данных с целочисленными значениями
 void valueHandlerInt(uint16_t params, uint16_t value) {
-    int len = snprintf(log_str, sizeof(log_str), "VALUE - %i", value);
+    int len = snprintf(log_str, sizeof(log_str), "VALUE - %i\n", value);
     if (len < 0 || len >= (int)sizeof(log_str)) {
-//        LogMessage("Format error");
+        HAL_UART_Transmit(&huart2, (uint8_t *)"Format error\n", 13, 100);
     } else {
-//        LogMessage("VALUE - %i", value);
+        HAL_UART_Transmit(&huart2, (uint8_t *)log_str, len, 100);
     }
     OBD2_NEED_NEXT_REQUEST = true;
     display_UpdateElementInt(params, value);
@@ -76,11 +76,11 @@ void valueHandlerInt(uint16_t params, uint16_t value) {
 
 //// Функция для обработки полученных данных с целочисленными значениями
 void valueHandlerFloat(uint16_t params, double value) {
-    int len = snprintf(log_str, sizeof(log_str), "VALUE - %.2f", value);
+    int len = snprintf(log_str, sizeof(log_str), "VALUE - %.2f\n", value);
     if (len < 0 || len >= (int)sizeof(log_str)) {
-//        LogMessage("Format error");
+        HAL_UART_Transmit(&huart2, (uint8_t *)"Format error\n", 13, 100);
     } else {
-//        LogMessage("VALUE - %i", value);
+        HAL_UART_Transmit(&huart2, (uint8_t *)log_str, len, 100);
     }
     OBD2_NEED_NEXT_REQUEST = true;
     display_UpdateElementFloat(params, value);
@@ -152,7 +152,8 @@ void obd2_SendFrame(uint16_t address, uint8_t byte0, uint8_t byte1, uint8_t byte
     for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         // Ожидание свободного места в TX FIFO
         while (HAL_FDCAN_GetTxFifoFreeLevel(&hfdcan1) == 0) {
-//            LogMessage("%08lu CAN Mailbox Busy (Attempt %d)", HAL_GetTick(), attempt);
+            sprintf(log_str, "CAN Mailbox Busy (Attempt %d)\n", attempt);
+            HAL_UART_Transmit(&huart2, (uint8_t*)log_str, strlen(log_str), HAL_MAX_DELAY);
         	HAL_Delay(5); // Ждем освобождения FIFO
         }
 
@@ -164,6 +165,7 @@ void obd2_SendFrame(uint16_t address, uint8_t byte0, uint8_t byte1, uint8_t byte
         // Попытка отправить сообщение
         if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, TxData) == HAL_OK) {
         	// Если успех – логируем
+            snprintf(log_str, sizeof(log_str), "%08lu CanTx: %lX [%ld] ", HAL_GetTick(), TxHeader.Identifier, TxHeader.DataLength);
             for (uint32_t i = 0; i < TxHeader.DataLength; i++) {
                 char buffer[4];
                 snprintf(buffer, sizeof(buffer), "%02X", TxData[i]); // Преобразуем значение в строку
@@ -172,17 +174,21 @@ void obd2_SendFrame(uint16_t address, uint8_t byte0, uint8_t byte1, uint8_t byte
                     strcat(log_str, " ");
                 }
             }
-//            LogMessage("%08lu CanTx: %lX [%ld] ", HAL_GetTick(), TxHeader.Identifier, TxHeader.DataLength);
+            strcat(log_str, "\n");
+            HAL_UART_Transmit(&huart2, (uint8_t *) log_str, strlen(log_str), 100);
+
             last_request_time = HAL_GetTick();
             return;  // Выход из функции после успешной отправки
         } else {
-//            LogMessage("CAN TX Error (Attempt %d, ID: 0x%X)", attempt, address);
+            sprintf(log_str, "CAN TX Error (Attempt %d, ID: 0x%X)\n", attempt, address);
+            HAL_UART_Transmit(&huart2, (uint8_t*)log_str, strlen(log_str), HAL_MAX_DELAY);
         }
 
         // Проверка ошибок
         uint32_t error = HAL_FDCAN_GetError(&hfdcan1);
         if (error != HAL_FDCAN_ERROR_NONE) {
-//            LogMessage("CAN Error: 0x%08lX", error);
+            sprintf(log_str, "CAN Error: 0x%08lX\n", error);
+            HAL_UART_Transmit(&huart2, (uint8_t*)log_str, strlen(log_str), HAL_MAX_DELAY);
         }
 
         // Задержка перед следующей попыткой
@@ -190,7 +196,8 @@ void obd2_SendFrame(uint16_t address, uint8_t byte0, uint8_t byte1, uint8_t byte
     }
 
     // Если после всех попыток отправка не удалась
-//    LogMessage("CAN TX FAILED after %d attempts (ID: 0x%X)", MAX_RETRIES, address);
+    sprintf(log_str, "CAN TX FAILED after %d attempts (ID: 0x%X)\n", MAX_RETRIES, address);
+    HAL_UART_Transmit(&huart2, (uint8_t*)log_str, strlen(log_str), HAL_MAX_DELAY);
 }
 
 uint32_t obd2_getLastRequestTime() {
