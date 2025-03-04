@@ -1,3 +1,0 @@
-/Users/rsmolyakov/STM32CubeIDE/workspace_1.16.1/BMW_LCD_Gauge_G474/cmake-build-debug/CMakeFiles/BMW_LCD_Gauge_G474.elf.dir
-/Users/rsmolyakov/STM32CubeIDE/workspace_1.16.1/BMW_LCD_Gauge_G474/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/rsmolyakov/STM32CubeIDE/workspace_1.16.1/BMW_LCD_Gauge_G474/cmake-build-debug/CMakeFiles/rebuild_cache.dir
