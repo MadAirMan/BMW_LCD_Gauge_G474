@@ -23,4 +23,10 @@ Release/
 .vscode/
 .idea/
 cmake-build-dubug/
+cmake-build-debug/
 cmake-build-dubug/*
+.DS_Store
+.stm32env
+STM32-for-VSCode.config.yaml
+STM32Make.make
+openocd.cfg
