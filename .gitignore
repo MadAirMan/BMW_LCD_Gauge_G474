@@ -18,7 +18,7 @@ Release/
 *.d
 *.lst
 *.out
-.DS_Store
+.DS_Store/
 
 # Файлы IDE
 .vscode/
